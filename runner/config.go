@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"bufio"
 	"embed"
 	"fmt"
 	"io/ioutil"
@@ -97,11 +98,28 @@ func initConfig(path string, hfs embed.FS) (cfg *config, err error) {
 			}
 		} else {
 			cfg = new(config)
-			dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+			/*dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 			if err != nil {
 				return nil, err
 			}
-			runName := dir[strings.LastIndex(dir, "/") + 1:]
+			runName := dir[strings.LastIndex(dir, "/") + 1:]*/
+
+			file, err := os.Open("go.mod")
+			if err != nil {
+				return nil, err
+			}
+			var runName string
+			scanner := bufio.NewScanner(file)
+			for i := 0; scanner.Scan(); i++ {
+				line := scanner.Text()
+				if strings.Contains(line, "module") {
+					runName = strings.Trim(line[strings.Index(line, "module ") + 7:], " ")
+					break
+				}
+			}
+			if runName == "" {
+				runName = "main"
+			}
 			ndata := strings.ReplaceAll(string(data), "mainfly", runName)
 
 			if err = toml.Unmarshal([]byte(ndata), cfg); err != nil {

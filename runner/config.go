@@ -89,20 +89,21 @@ type cfgScreen struct {
 func initConfig(path string, hfs embed.FS) (cfg *config, err error) {
 	if path == "" {
 		var data []byte
-		data, err = hfs.ReadFile("htdocs/air.conf" )
+		data, err = hfs.ReadFile("htdocs/air.toml" )
 		if err != nil {
 			cfg, err = defaultPathConfig()
 			if err != nil {
 				return nil, err
 			}
 		} else {
+			cfg = new(config)
 			dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-			if err == nil {
+			if err != nil {
 				return nil, err
 			}
 			runName := dir[strings.LastIndex(dir, "/") + 1:]
 			ndata := strings.ReplaceAll(string(data), "mainfly", runName)
-			cfg := new(config)
+
 			if err = toml.Unmarshal([]byte(ndata), cfg); err != nil {
 				return nil, err
 			}
@@ -233,18 +234,17 @@ func readConfig(path string) (*config, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	cfg := new(config)
 	if err = toml.Unmarshal(data, cfg); err != nil {
 		return nil, err
 	}
-
 	return cfg, nil
 }
 
 func readConfigOrDefault(path string) (*config, error) {
 	dftCfg := defaultConfig()
 	cfg, err := readConfig(path)
+
 	if err != nil {
 		return &dftCfg, err
 	}

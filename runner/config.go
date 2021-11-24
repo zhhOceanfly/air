@@ -220,7 +220,7 @@ func defaultConfig() config {
 	}
 	return config{
 		Root:        ".",
-		TmpDir:      "tmp",
+		TmpDir:      "",
 		TestDataDir: "testdata",
 		Build:       build,
 		Color:       color,

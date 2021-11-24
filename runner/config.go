@@ -89,7 +89,7 @@ type cfgScreen struct {
 func initConfig(path string, hfs embed.FS) (cfg *config, err error) {
 	if path == "" {
 		var data []byte
-		data, err = hfs.ReadFile("htdocs/.air.toml" )
+		data, err = hfs.ReadFile("htdocs/air.conf" )
 		if err != nil {
 			cfg, err = defaultPathConfig()
 			if err != nil {

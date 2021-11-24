@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"embed"
 	"fmt"
 	"io"
 	"os"
@@ -36,9 +37,9 @@ type Engine struct {
 }
 
 // NewEngine ...
-func NewEngine(cfgPath string, debugMode bool) (*Engine, error) {
+func NewEngine(cfgPath string, debugMode bool, hfs embed.FS) (*Engine, error) {
 	var err error
-	cfg, err := initConfig(cfgPath)
+	cfg, err := initConfig(cfgPath, hfs)
 	if err != nil {
 		return nil, err
 	}

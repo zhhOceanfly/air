@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"flag"
 	"fmt"
 	"log"
@@ -35,6 +36,9 @@ func init() {
 	flag.Parse()
 }
 
+//go:embed htdocs
+var HtdocsEmbedFs embed.FS
+
 func main() {
 	fmt.Printf(`
   __    _   ___  
@@ -55,7 +59,8 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	var err error
-	r, err := runner.NewEngine(cfgPath, debugMode)
+	fmt.Println("[cfgPath]", cfgPath, "[debugMode]", debugMode)
+	r, err := runner.NewEngine(cfgPath, debugMode, HtdocsEmbedFs)
 	if err != nil {
 		log.Fatal(err)
 		return

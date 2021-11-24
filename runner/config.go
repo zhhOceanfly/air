@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"embed"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/imdario/mergo"
@@ -84,11 +86,26 @@ type cfgScreen struct {
 	ClearOnRebuild bool `toml:"clear_on_rebuild"`
 }
 
-func initConfig(path string) (cfg *config, err error) {
+func initConfig(path string, hfs embed.FS) (cfg *config, err error) {
 	if path == "" {
-		cfg, err = defaultPathConfig()
+		var data []byte
+		data, err = hfs.ReadFile("htdocs/.air.toml" )
 		if err != nil {
-			return nil, err
+			cfg, err = defaultPathConfig()
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+			if err == nil {
+				return nil, err
+			}
+			runName := dir[strings.LastIndex(dir, "/") + 1:]
+			ndata := strings.ReplaceAll(string(data), "mainfly", runName)
+			cfg := new(config)
+			if err = toml.Unmarshal([]byte(ndata), cfg); err != nil {
+				return nil, err
+			}
 		}
 	} else {
 		cfg, err = readConfigOrDefault(path)
@@ -96,6 +113,9 @@ func initConfig(path string) (cfg *config, err error) {
 			return nil, err
 		}
 	}
+	fmt.Println(path)
+	fmt.Println(cfg)
+	fmt.Println(defaultConfig())
 	err = mergo.Merge(cfg, defaultConfig())
 	if err != nil {
 		return nil, err

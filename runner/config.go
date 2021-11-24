@@ -114,13 +114,13 @@ func initConfig(path string, hfs embed.FS) (cfg *config, err error) {
 			return nil, err
 		}
 	}
-	fmt.Println(path)
-	fmt.Println(cfg)
-	fmt.Println(defaultConfig())
+
 	err = mergo.Merge(cfg, defaultConfig())
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("[path]", path)
+	fmt.Println("[cfg]", cfg)
 	err = cfg.preprocess()
 	return cfg, err
 }
